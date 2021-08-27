@@ -33,6 +33,9 @@ int main (int argc, char const *argv[])
   {
     cout << "Failed to send message";
   }
+
+  recv(sock, &message, strlen(message), 0);
+  cout << "Received back " << message;
 }
 
 
