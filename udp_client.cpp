@@ -16,7 +16,8 @@ int main (int argc, char const *argv[])
     return -1;
   }
 
-  const char *message = argv[1];
+  const char *send_message = argv[1];
+  char receive_message[1024] = "";
 
   if((sock = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
   {
@@ -27,17 +28,21 @@ int main (int argc, char const *argv[])
   struct sockaddr_in dest; 
   dest.sin_family = AF_INET;
   dest.sin_port = htons(serverPort);
+  memset(&dest.sin_zero, 0, sizeof dest.sin_zero);
   inet_pton(AF_INET, "127.0.0.1", &dest.sin_addr);
+
+  cout << "Sending send_message " << send_message << "\n";
   
-  if(sendto(sock, message, strlen(message), 0, (struct sockaddr *) &dest, sizeof(dest)) < 0) 
+  if(sendto(sock, send_message, strlen(send_message), 0, (struct sockaddr *) &dest, sizeof(dest)) < 0) 
   {
     cout << "Failed to send message";
   }
 
-  cout << "Message sent";
+  cout << "send_message sent" << std::endl;
 
-  recvfrom(sock, &message, strlen(message), 0, (struct sockaddr *) &dest, (socklen_t *) sizeof dest);
-  cout << "Received back " << message;
+  sockaddr *dest_addr = (sockaddr *) &dest;
+  socklen_t dest_size = sizeof(*dest_addr);
+  recvfrom(sock, &receive_message, sizeof(receive_message), 0, dest_addr, &dest_size);
+  cout << "Received back " << receive_message << std::endl;
 }
-
 
